@@ -1,8 +1,6 @@
 public class Main {
     public static void main(String[] args) {
-        Client client1 = new Client();
-        Client client2 = new Client();
-        client1.start();
-        client2.start();
+        Client client = new Client();
+        client.start();
     }
 }

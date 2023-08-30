@@ -11,25 +11,34 @@ public class Service implements Runnable {
 
     @Override
     public void run() {
-        try (
-                InputStream inputStream = socket.getInputStream();
-                OutputStream outputStream = socket.getOutputStream();
-                Writer writer = new OutputStreamWriter(outputStream);
-                Reader reader = new InputStreamReader(inputStream);
-                BufferedReader bufferedReader = new BufferedReader(reader);
-                BufferedWriter bufferedWriter = new BufferedWriter(writer)
-        ) {
-
-            String message = bufferedReader.readLine();
-            System.out.println(message);
-
-
-            bufferedWriter.write("hello from server");
-            bufferedWriter.newLine();
-            bufferedWriter.flush();
-
-        } catch (IOException e) {
+        try {
+            sandMessage("welcome from server");
+            while (true) {
+                String message = receiveMessage();
+                System.out.println("Received:" + message);
+                if (message.equals("exit")) {
+                    socket.shutdownOutput();
+                    break;
+                } else {
+                    sandMessage(message.toUpperCase());
+                }
+                }
+        } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void sandMessage(String msg) throws IOException {
+        OutputStream outputStream = socket.getOutputStream();
+        BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
+        bufferedWriter.write(msg);
+        bufferedWriter.newLine();
+        bufferedWriter.flush();
+    }
+
+    private String receiveMessage() throws IOException {
+        InputStream inputStream = socket.getInputStream();
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+        return bufferedReader.readLine();
     }
 }
