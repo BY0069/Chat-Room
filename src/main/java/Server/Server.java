@@ -16,7 +16,7 @@ public class Server {
             while(true) {
                 socket = server.accept();
                 executorService.execute(new Service(socket));
-                System.out.println(executorService);
+                // System.out.println(executorService);
             }
         } catch (Exception e) {
             e.printStackTrace();
