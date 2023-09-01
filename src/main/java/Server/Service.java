@@ -11,9 +11,9 @@ public class Service implements Runnable {
 
     private final Socket socket;
 
-    private static volatile String message;
+    private static String message;
 
-    private static volatile boolean isReceived = false;
+    private static boolean isReceived = false;
 
     private static final Object lock = new Object();
 
