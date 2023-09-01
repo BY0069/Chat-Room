@@ -18,11 +18,13 @@ public class Service implements Runnable {
     public void run() {
         try {
             group.addClient(socket);
-            group.groupMessage("welcome from server");
+            group.groupMessage("New user joined!");
+            group.groupMessage("Online users:" + group.length());
             String message;
             while ((message = Poster.receiveMessage(socket)) != null) {
                 if (message.equals("exit")) {
-                    socket.shutdownOutput();
+                    socket.close();
+                    group.removeClient(socket);
                     break;
                 }
                 System.out.println("Receive:" + message);

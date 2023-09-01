@@ -24,6 +24,18 @@ public class Group {
         clients.add(socket);
     }
 
+    public void removeClient(Socket socket) {
+        if (clients.contains(socket)) {
+            clients.remove(socket);
+        } else {
+            throw new NullPointerException();
+        }
+    }
+
+    public int length() {
+        return clients.size();
+    }
+
     public void groupMessage(String msg) throws IOException {
         for (Socket client : clients) {
             Poster.sandMessage(client, msg);

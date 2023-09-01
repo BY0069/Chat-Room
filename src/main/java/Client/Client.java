@@ -13,10 +13,15 @@ public class Client {
 
     public void start() {
         try (Socket client = new Socket(host, port)) {
-            new Thread(new receiver(client)).start();
+            Thread receiver = new Thread(new receiver(client));
+            receiver.start();
             while (true) {
-                String message = new Scanner(System.in).nextLine();
-                Poster.sandMessage(client, message);
+                if (receiver.isAlive()) {
+                    String message = new Scanner(System.in).nextLine();
+                    Poster.sandMessage(client, message);
+                } else {
+                    break;
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -38,7 +43,7 @@ class receiver implements Runnable {
             while ((message = Poster.receiveMessage(socket)) != null) {
                 if (message.equals("exit")) {
                     socket.close();
-                    throw new ConnectException();
+                    break;
                 } else {
                     System.out.println(message);
                 }
