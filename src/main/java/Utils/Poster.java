@@ -4,13 +4,15 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 public class Poster {
 
     private Poster() {}
-    public static void sandMessage(@NotNull Socket socket, String msg) throws IOException {
+    public static void sendMessage(@NotNull Socket socket, String msg) throws IOException {
         OutputStream outputStream = socket.getOutputStream();
-        BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
+        OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
+        BufferedWriter bufferedWriter = new BufferedWriter(outputStreamWriter);
         bufferedWriter.write(msg);
         bufferedWriter.newLine();
         bufferedWriter.flush();
@@ -18,7 +20,8 @@ public class Poster {
 
     public static String receiveMessage(@NotNull Socket socket) throws IOException{
         InputStream inputStream = socket.getInputStream();
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+        InputStreamReader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
         return bufferedReader.readLine();
     }
 }

@@ -38,7 +38,7 @@ public class Group {
 
     public void groupMessage(String msg) throws IOException {
         for (Socket client : clients) {
-            Poster.sandMessage(client, msg);
+            Poster.sendMessage(client, msg);
         }
     }
 }

@@ -1,9 +1,14 @@
 package Server;
 
+import Entity.Message;
+import Entity.User;
 import Utils.Poster;
+import com.alibaba.fastjson2.JSON;
 
 import java.io.IOException;
+import java.lang.invoke.SwitchPoint;
 import java.net.Socket;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -11,13 +16,11 @@ public class Service implements Runnable {
 
     private final Socket socket;
 
-    private static String message;
-
     private static boolean isReceived = false;
 
-    private static final Object lock = new Object();
+    private static Message info;
 
-    private final Group group = Group.getGroup();
+    private static final Object lock = new Object();
 
     public Service(Socket socket) {
         this.socket = socket;
@@ -27,13 +30,10 @@ public class Service implements Runnable {
     public void run() {
         ExecutorService pool = Executors.newFixedThreadPool(2);
         try {
-            group.addClient(socket);
-            group.groupMessage("New user joined!");
-            group.groupMessage("Online users:" + group.length());
             pool.execute(new Sender());
             pool.execute(new Receiver());
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException();
         } finally {
             pool.shutdown();
         }
@@ -48,13 +48,36 @@ public class Service implements Runnable {
                     synchronized (lock) {
                         lock.notify();
                         if (!isReceived) {
-                            message = Poster.receiveMessage(socket);
-                            if (message != null) {
-                                if (message.equals("exit")) {
-                                    socket.close();
-                                    group.removeClient(socket);
+                            String line = Poster.receiveMessage(socket);
+                            info = JSON.parseObject(line, Message.class);
+                            Integer type = info.getType();
+                            switch (type) {
+                                case 1: {
+                                    String[] infos = info.getContent().split("\\|");
+                                    String username = infos[0];
+                                    String password = infos[1];
+
+                                    // TODO: 数据库登录校验
                                 }
-                                System.out.println("Receive:" + message);
+
+                                case 2: {
+                                    String[] infos = info.getContent().split("\\|");
+                                    String username = infos[0];
+                                    String password = infos[1];
+                                    String nickname = infos[2];
+
+                                    User user = new User();
+                                    user.setId(UUID.randomUUID().toString());
+                                    user.setUsername(username);
+                                    user.setPassword(password);
+                                    user.setNickname(nickname);
+
+                                    System.out.println(user);
+
+                                    //TODO: 写入数据库
+
+                                    break;
+                                }
                             }
                         }
                         isReceived = true;
@@ -62,7 +85,7 @@ public class Service implements Runnable {
                     }
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                throw new RuntimeException();
             }
         }
     }
@@ -74,19 +97,26 @@ public class Service implements Runnable {
                 while (!socket.isClosed()) {
                     synchronized (lock) {
                         while (!isReceived) {
-                            System.out.println("Sender waiting...");
                             lock.wait();
                         }
                         lock.notify();
                         isReceived = false;
-                        group.groupMessage(message);
+                        switch (info.getType()) {
+                            case 1: {
+
+                            }
+                            case 2: {
+                                Message res = new Message();
+                                res.setType(5);
+                                res.setContent("Register Success!");
+                                Poster.sendMessage(socket, JSON.toJSONString(res));
+                            }
+                        }
+
                     }
                 }
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+            } catch (Exception e) {
+                throw new RuntimeException();
             }
         }
     }
