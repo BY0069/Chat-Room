@@ -15,12 +15,12 @@ public class Client {
 
     private static Socket client;
 
-    public static Socket getClient() {
-        return client;
-    }
-
     public Client(String host, int port) throws IOException {
         client = new Socket(host, port);
+    }
+
+    public static Socket getClient() {
+        return client;
     }
 
     public void start() {

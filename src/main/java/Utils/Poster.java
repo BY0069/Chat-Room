@@ -8,7 +8,9 @@ import java.nio.charset.StandardCharsets;
 
 public class Poster {
 
-    private Poster() {}
+    private Poster() {
+    }
+
     public static void sendMessage(@NotNull Socket socket, String msg) throws IOException {
         OutputStream outputStream = socket.getOutputStream();
         OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
@@ -18,7 +20,7 @@ public class Poster {
         bufferedWriter.flush();
     }
 
-    public static String receiveMessage(@NotNull Socket socket) throws IOException{
+    public static String receiveMessage(@NotNull Socket socket) throws IOException {
         InputStream inputStream = socket.getInputStream();
         InputStreamReader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
         BufferedReader bufferedReader = new BufferedReader(inputStreamReader);

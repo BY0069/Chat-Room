@@ -2,12 +2,19 @@ package Entity;
 
 import java.util.Objects;
 
+/**
+ * 用户类，用于保存用户相关信息
+ */
 public class User {
 
     private String id;
     private String username;
     private String nickname;
     private String password;
+    private Status status;
+
+    public User() {
+    }
 
     public String getId() {
         return id;
@@ -39,6 +46,14 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     @Override

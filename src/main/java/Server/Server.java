@@ -5,20 +5,22 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * 服务器类，维护一个线程池，用于执行服务类
+ */
 public class Server {
     static int port = 10899;
 
     public static void main(String[] args) {
-        Socket socket;
         ExecutorService executorService = Executors.newCachedThreadPool();
-        try(ServerSocket server = new ServerSocket(port)) {
+        try (ServerSocket server = new ServerSocket(port)) {
             System.out.println("Waiting...");
-            while(true) {
-                socket = server.accept();
+            while (true) {
+                Socket socket = server.accept();
                 executorService.execute(new Service(socket));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException();
         } finally {
             executorService.shutdown();
         }
